@@ -63,14 +63,21 @@ class HomeBannerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BannerBloc, BannerState>(
+    return BlocConsumer<BannerBloc, BannerState>(
+      listener: (context, state) {
+        if (state is BannerError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
       builder: (context, state) {
         return switch (state) {
           BannerInitial() || BannerLoading() => const ShimmerBanner(),
           BannerLoaded(banners: var data) => BannerWidget(
             bannerImages: data.map((b) => b.thumbnail).toList(),
           ),
-          BannerError(message: var msg) => Text("Lỗi banner: $msg"),
+          BannerError() => const Text("Lỗi banner"),
         };
       },
     );
@@ -111,30 +118,29 @@ class HomeProductSection extends StatelessWidget {
           return Text("Lỗi sản phẩm: ${state.error}");
         } else {
           return Stack(
-
             children: [
               ListView.separated(
-              itemCount: state.products.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) => InkWell(
-                onTap: () {
-                  context.push(
-                    '/product_detail/${state.products[index].id}',
-                  ); // Navigate to product detail page
-                },
-                child: ProductCard(product: state.products[index]),
-              ),
-            ),
-            if (state.isLoading)
-              Positioned.fill(
-                child: Container(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  child: const Center(child: CircularProgressIndicator()),
+                itemCount: state.products.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, index) => InkWell(
+                  onTap: () {
+                    context.push(
+                      '/product_detail/${state.products[index].id}',
+                    ); // Navigate to product detail page
+                  },
+                  child: ProductCard(product: state.products[index]),
                 ),
               ),
-            ]
+              if (state.isLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
           );
         }
       },

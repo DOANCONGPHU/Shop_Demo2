@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 
 class DioClient {
@@ -16,6 +17,23 @@ class DioClient {
       LogInterceptor(
         requestBody: true,
         responseBody: true,
+      ),
+    );
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          var connectivityResult = await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none) {
+            return handler.reject(
+              DioException(
+                requestOptions: options,
+                message: "Không có kết nối Internet!",
+              ),
+            );
+          }
+          return handler.next(options);
+        },
       ),
     );
   }

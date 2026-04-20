@@ -69,6 +69,9 @@ class ProductRepository {
     if (e.response?.statusCode == 404) {
       return "Không tìm thấy dữ liệu";
     }
+    if(e.message=="Không có kết nối Internet!") {
+      return "Không có kết nối Internet!";
+    }
     return "Có lỗi xảy ra";
   }
 }

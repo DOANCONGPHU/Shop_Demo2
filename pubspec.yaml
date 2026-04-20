@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.6.0
   dio: ^5.0.0
+  connectivity_plus: ^4.0.0
   json_annotation: ^4.9.0   
   go_router: ^14.0.0
   smooth_page_indicator: ^1.0.0
@@ -104,4 +105,4 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
-    - assets/vietnam.json
+    - assets/vietnam.geojson
