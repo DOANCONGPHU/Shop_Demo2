@@ -10,11 +10,9 @@ part 'cart_state.dart';
 class CartCubit extends Cubit<CartState> {
   CartCubit() : super(CartInitial());
 
-  // 1. Thêm sản phẩm vào giỏ
   void addToCart(CartItem newItem) {
     List<CartItem> currentItems = [];
 
-    // Nếu đang ở trạng thái đã load, lấy danh sách cũ ra
     if (state is CartLoaded) {
       currentItems = List.from((state as CartLoaded).items);
     }
@@ -22,7 +20,7 @@ class CartCubit extends Cubit<CartState> {
     final int existingIndex = currentItems.indexWhere((i) => i.id == newItem.id);
 
     if (existingIndex != -1) {
-      // Nếu trùng ID, dùng copyWith để tăng số lượng (Immutability)
+      // trùng ID,  copyWith tăng số lượng 
       currentItems[existingIndex] = currentItems[existingIndex].copyWith(
         quantity: currentItems[existingIndex].quantity + newItem.quantity,
       );
@@ -33,7 +31,6 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoaded(currentItems));
   }
 
-  // 2. Xóa sản phẩm
   void removeFromCart(int itemId) {
     if (state is CartLoaded) {
       final updatedItems = (state as CartLoaded)
@@ -44,7 +41,6 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  // 3. Cập nhật số lượng (Tăng/Giảm)
   void updateQuantity(int itemId, int newQuantity) {
     if (state is CartLoaded) {
       if (newQuantity <= 0) {
@@ -60,12 +56,10 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  // 4. Xóa sạch giỏ hàng
   void clearCart() {
     emit(const CartLoaded([]));
   }
 
-  // 5. Tính tổng tiền (Getter)
   double get totalPrice {
     final currentState = state;
     if (currentState is CartLoaded) {

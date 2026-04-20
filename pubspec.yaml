@@ -43,6 +43,8 @@ dependencies:
   equatable: ^2.0.3
   cached_network_image: ^3.2.0
   shimmer: ^3.0.0
+  flutter_echarts: ^2.5.0
+
 
 dev_dependencies:
   flutter_test:
@@ -100,3 +102,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  assets:
+    - assets/vietnam.json

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_app/features/Cart/views/cart_screen.dart';
-import 'package:my_app/features/Favourite/fav_screen.dart';
+import 'package:my_app/features/Chart/chart_screen.dart';
 import 'package:my_app/features/Home/views/homepage_screen.dart';
 import 'package:my_app/features/Home/views/product_detail_screen.dart';
 import 'package:my_app/features/Profile/profile_screen.dart';
@@ -14,15 +14,25 @@ class AppRoutes {
       ShellRoute(
         builder: (context, state, child) => ScaffoldWithNavBar(child: child),
         routes: [
-          GoRoute(path: '/home', pageBuilder: (context, state) => const NoTransitionPage(child: MyHomePage())),
-          GoRoute(path: '/cart', pageBuilder: (context, state) => const NoTransitionPage(child: CartPage())),
           GoRoute(
-            path: '/favorite',
-            pageBuilder: (context, state) => const NoTransitionPage(child: FavScreen()),
+            path: '/home',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: MyHomePage()),
+          ),
+          GoRoute(
+            path: '/cart',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CartPage()),
+          ),
+          GoRoute(
+            path: '/chart',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ChartScreen()),
           ),
           GoRoute(
             path: '/profile',
-            pageBuilder: (context, state) => const NoTransitionPage(child: ProfileScreen()),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),

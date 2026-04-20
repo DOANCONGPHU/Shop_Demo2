@@ -13,7 +13,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
       body: child,
       bottomNavigationBar: NavigationBar(  
         height: 40,
-        backgroundColor: Colors.white,
         elevation: 0,
         indicatorColor: Colors.blue.withValues(alpha: 0.12), // nhẹ hơn
         labelBehavior: NavigationDestinationLabelBehavior
@@ -53,7 +52,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     if (location.startsWith('/home')) return 0;
-    if (location.startsWith('/favorite')) return 1;
+    if (location.startsWith('/chart')) return 1;
     if (location.startsWith('/cart')) return 2;
     if (location.startsWith('/profile')) return 3;
     return 0;
@@ -65,7 +64,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
         context.go('/home');
         break;
       case 1:
-        context.go('/favorite');
+        context.go('/chart');
         break;
       case 2:
         context.go('/cart');

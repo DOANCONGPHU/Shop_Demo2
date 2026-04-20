@@ -87,9 +87,11 @@ class ProductCard extends StatelessWidget {
                             horizontal: 12,
                             vertical: 6,
                           ),
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: Colors.blue[900],
+                          foregroundColor: Colors.white,
+                          elevation: 4,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: Text(

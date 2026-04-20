@@ -82,10 +82,29 @@ class CartItemCard extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              onPressed: () =>
-                  context.read<CartCubit>().removeFromCart(cartItem.id),
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[900],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 4,
+                  ),
+                  onPressed: () {
+                    context.read<CartCubit>().removeFromCart(cartItem.id);
+                  },
+                  child: Text("Remove"),
+                ),
+              ],
             ),
           ],
         ),
@@ -108,7 +127,6 @@ class CartItemCard extends StatelessWidget {
         ),
         child: Icon(icon, size: 18),
       ),
-        
     );
   }
 }
