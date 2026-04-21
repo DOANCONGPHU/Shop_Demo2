@@ -7,12 +7,15 @@ import 'package:my_app/features/Home/views/product_detail_screen.dart';
 import 'package:my_app/features/Profile/profile_screen.dart';
 import 'package:my_app/features/tabbar.dart';
 
+
 class AppRoutes {
   static final router = GoRouter(
     initialLocation: '/home',
     routes: [
       ShellRoute(
-        builder: (context, state, child) => ScaffoldWithNavBar(child: child),
+        builder: (context, state, child) => ScaffoldWithNavBar(child: child,
+        location: state.uri.path,
+        ),
         routes: [
           GoRoute(
             path: '/home',
@@ -34,6 +37,14 @@ class AppRoutes {
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfileScreen()),
           ),
+          GoRoute(
+            path: '/settings',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: Center(
+                child: Text("Settings Screen"),
+              ),
+            ),
+          )
         ],
       ),
 

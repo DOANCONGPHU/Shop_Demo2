@@ -14,3 +14,4 @@ final class FetchProductsByCategory extends ProductEvent {
   @override
   List<Object> get props => [categoryId];
 }
+final class RetryFetchProducts extends ProductEvent {}

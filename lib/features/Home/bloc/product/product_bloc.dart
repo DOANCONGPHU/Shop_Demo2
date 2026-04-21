@@ -23,14 +23,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         () => repo.getProductsByCategory(event.categoryId),
       );
     });
+
+    on<RetryFetchProducts>((event, emit) {
+      if (state.error != null) {
+        add(FetchAllProducts()); 
+      }
+    });
   }
 
   Future<void> _handleLoad(
     Emitter<ProductState> emit,
     Future<List<Products>> Function() fetcher,
   ) async {
-    //  copyWith nhưng KHÔNG truyền products mới vào đây
-    // isLoading = true, nhưng state.products VẪN GIỮ GIÁ TRỊ CŨ
     emit(state.copyWith(isLoading: true, error: null));
 
     try {

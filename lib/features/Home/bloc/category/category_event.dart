@@ -13,3 +13,4 @@ final class SelectCategory extends CategoryEvent {
   @override
   List<Object> get props => [categoryId];
 }
+final class RetryFetchCategories extends CategoryEvent {}

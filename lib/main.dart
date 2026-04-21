@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_app/core/network/network_cubit.dart';
 import 'package:my_app/core/routes/app_routes.dart';
 import 'package:my_app/features/Home/bloc/banner/banner_bloc.dart';
 import 'package:my_app/features/Home/bloc/category/category_bloc.dart';
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<CartCubit>(
           create: (_) => CartCubit(),
+        ),
+        BlocProvider<NetworkCubit>(
+          create: (_) => NetworkCubit(),
         ),
       ],
       child: MaterialApp.router(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_app/core/network/network_cubit.dart';
+import 'package:my_app/core/network/network_wrapper.dart';
 import 'package:my_app/core/widgets/banner_widget.dart';
 import 'package:my_app/core/widgets/category_widget.dart';
 import 'package:my_app/features/Home/views/product_card.dart';
@@ -38,19 +40,31 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         backgroundColor: Colors.grey[400],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              const MySearchBar(),
-              const SizedBox(height: 12),
-              const HomeBannerSection(),
-              const SizedBox(height: 12),
-              const HomeCategorySection(),
-              const SizedBox(height: 12),
-              const HomeProductSection(),
-            ],
+      body: BlocListener<NetworkCubit, NetworkState>(
+        listener: (BuildContext context, state) {
+          if (state is NetworkConnected) {
+            context.read<ProductBloc>().add(RetryFetchProducts());
+            context.read<CategoryBloc>().add(RetryFetchCategories());
+            context.read<BannerBloc>().add(RetryFetchBanners());
+            if (Navigator.of(context).canPop()) Navigator.pop(context);
+          }
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                NetworkWrapper(),
+                const SizedBox(height: 12),
+                const MySearchBar(),
+                const SizedBox(height: 12),
+                const HomeBannerSection(),
+                const SizedBox(height: 12),
+                const HomeCategorySection(),
+                const SizedBox(height: 12),
+                const HomeProductSection(),
+              ],
+            ),
           ),
         ),
       ),

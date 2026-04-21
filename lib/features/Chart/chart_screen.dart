@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 
-
 class ChartScreen extends StatelessWidget {
   const ChartScreen({super.key});
 

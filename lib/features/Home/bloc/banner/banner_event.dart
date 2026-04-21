@@ -7,3 +7,4 @@ sealed class BannerEvent extends Equatable {
   List<Object> get props => [];
 }
 final class FetchBanners extends BannerEvent {}
+final class RetryFetchBanners extends BannerEvent {}

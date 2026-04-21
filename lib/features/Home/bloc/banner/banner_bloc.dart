@@ -19,5 +19,9 @@ class BannerBloc extends Bloc<BannerEvent, BannerState> {
         emit(BannerError(e.toString()));
       }
     });
+    on<RetryFetchBanners>((event, emit) async {
+      final banners = await repo.getBanners();
+      emit(BannerLoaded(banners));
+    });
   }
 }
