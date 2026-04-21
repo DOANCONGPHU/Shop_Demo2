@@ -11,9 +11,13 @@ import 'package:my_app/features/Home/data/product_repository.dart';
 import 'package:my_app/features/Cart/cubit/cart_cubit.dart';
 
 void main() {
+  final dioClient = DioClient();
+  final productApi = ProductApi(dioClient.dio);
+  final productRepository = ProductRepository(productApi);
+
   runApp(
-    RepositoryProvider(
-      create: (context) => ProductRepository(ProductApi(DioClient().dio)),
+    RepositoryProvider<ProductRepository>.value(
+      value: productRepository,
       child: const MyApp(),
     ),
   );
@@ -27,13 +31,14 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<BannerBloc>(
-          create: (_) => BannerBloc(context.read())..add(FetchBanners()),
+          create: (context) => BannerBloc(context.read<ProductRepository>()),
+          // Không add event ở đây nữa
         ),
         BlocProvider<ProductBloc>(
-          create: (_) => ProductBloc(context.read())..add(FetchAllProducts()),
+          create: (context) => ProductBloc(context.read<ProductRepository>()),
         ),
         BlocProvider<CategoryBloc>(
-          create: (_) => CategoryBloc(context.read())..add(FetchCategories()),
+          create: (context) => CategoryBloc(context.read<ProductRepository>()),
         ),
         BlocProvider<CartCubit>(
           create: (_) => CartCubit(),
