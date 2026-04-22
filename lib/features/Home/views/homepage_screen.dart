@@ -7,11 +7,10 @@ import 'package:my_app/core/widgets/banner_widget.dart';
 import 'package:my_app/core/widgets/category_widget.dart';
 import 'package:my_app/features/Home/bloc/category/category_bloc.dart';
 import 'package:my_app/features/Home/data/product_repository.dart';
-import 'package:my_app/features/Home/views/product_card.dart';
+import 'package:my_app/features/Home/widgets/product_card.dart';
 import 'package:my_app/core/widgets/search_bar.dart';
 import 'package:my_app/core/widgets/shimmer.dart';
 import 'package:my_app/features/Home/bloc/banner/banner_bloc.dart';
-import 'package:my_app/features/Home/bloc/category/category_bloc.dart';
 import 'package:my_app/features/Home/bloc/product/product_bloc.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -35,12 +34,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final categoryBloc = context.read<CategoryBloc>();
     final bannerBloc = context.read<BannerBloc>();
 
-    // Chỉ fetch nếu chưa có dữ liệu
     if (productBloc.state.products.isEmpty) {
       productBloc.add(FetchAllProducts());
     }
     if (categoryBloc.state.categories.isEmpty) {
-      categoryBloc.add(FetchCategories()); // giả sử event tên này
+      categoryBloc.add(FetchCategories()); 
     }
     if (bannerBloc.state is BannerInitial ||
         (bannerBloc.state is BannerLoaded)) {
@@ -60,13 +58,13 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Color.fromARGB(255, 70, 125, 203),
           ),
         ),
-        backgroundColor: Colors.grey[400],
+        shadowColor: Colors.black,
+        elevation: 1,
       ),
       body: BlocListener<NetworkCubit, NetworkState>(
         listener: (context, state) {
           if (state is NetworkConnected) {
             final productState = context.read<ProductBloc>().state;
-            // Chỉ retry khi thật sự lỗi và chưa có dữ liệu
             if (productState.error != null && productState.products.isEmpty) {
               context.read<ProductBloc>().add(RetryFetchProducts());
               context.read<CategoryBloc>().add(RetryFetchCategories());
@@ -78,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onRefresh: () async {
             context
                 .read<ProductRepository>()
-                .clearCache(); // clear cache khi pull refresh
+                .clearCache(); 
             _fetchInitialData();
           },
           child: CustomScrollView(
@@ -89,13 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     children: [
                       NetworkWrapper(),
-                      const SizedBox(height: 12),
                       const MySearchBar(),
                       const SizedBox(height: 12),
                       const HomeBannerSection(),
                       const SizedBox(height: 12),
                       const HomeCategorySection(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -160,7 +157,7 @@ class HomeCategorySection extends StatelessWidget {
 }
 
 
-// --- PRODUCT SECTION (CRITICAL FOR PERFORMANCE) ---
+// --- PRODUCT SECTION  ---
 
 class HomeProductSection extends StatelessWidget {
   const HomeProductSection({super.key});

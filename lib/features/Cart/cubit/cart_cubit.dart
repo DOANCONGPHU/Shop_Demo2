@@ -1,14 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:my_app/features/Cart/models/cart_model.dart';
+import 'package:isar_community/isar.dart';
 
-// Giả sử ông đã định nghĩa CartItem ở một file khác
-// import 'cart_item.dart'; 
+import 'package:my_app/core/database/isar_service.dart';
+import 'package:my_app/features/Cart/models/cart_model.dart';
+import 'package:my_app/features/Cart/models/purchased_product.dart';
 
 part 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
-  CartCubit() : super(CartInitial());
+  final IsarService isarService;
+
+  CartCubit(this.isarService) : super(CartInitial());
 
   void addToCart(CartItem newItem) {
     List<CartItem> currentItems = [];
@@ -17,10 +20,11 @@ class CartCubit extends Cubit<CartState> {
       currentItems = List.from((state as CartLoaded).items);
     }
 
-    final int existingIndex = currentItems.indexWhere((i) => i.id == newItem.id);
+    final int existingIndex = currentItems.indexWhere(
+      (i) => i.id == newItem.id,
+    );
 
     if (existingIndex != -1) {
-      // trùng ID,  copyWith tăng số lượng 
       currentItems[existingIndex] = currentItems[existingIndex].copyWith(
         quantity: currentItems[existingIndex].quantity + newItem.quantity,
       );
@@ -33,8 +37,7 @@ class CartCubit extends Cubit<CartState> {
 
   void removeFromCart(int itemId) {
     if (state is CartLoaded) {
-      final updatedItems = (state as CartLoaded)
-          .items
+      final updatedItems = (state as CartLoaded).items
           .where((item) => item.id != itemId)
           .toList();
       emit(CartLoaded(updatedItems));
@@ -60,10 +63,54 @@ class CartCubit extends Cubit<CartState> {
     emit(const CartLoaded([]));
   }
 
+  Future<void> checkout() async {
+    if (state is! CartLoaded || (state as CartLoaded).items.isEmpty) {
+      emit(const CartError("Giỏ hàng trống!"));
+      return;
+    }
+    final currentItems = (state as CartLoaded).items;
+    emit(CartLoading());
+
+    try {
+      await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+      final purchasedItems = List<CartItem>.from(currentItems);
+
+      await _savePurchasedProducts(purchasedItems);
+
+      emit(CartCheckoutSuccess(purchasedItems));
+    } catch (e) {
+      emit(CartError("Checkout thất bại: ${e.toString()}"));
+    }
+  }
+
+  Future<void> _savePurchasedProducts(List<CartItem> purchasedItems) async {
+    final isar = isarService.db;
+    final List<PurchasedProduct> purchasedProducts = purchasedItems.map((item) {
+      return PurchasedProduct(productId: item.id.toString());
+    }).toList();
+
+    await isar.writeTxn(() async {
+      await isar.purchasedProducts.putAll(purchasedProducts);
+    });
+  }
+
+  Future<bool> isProductPurchased(String productId) async {
+    final isar = isarService.db;
+    final count = await isar.purchasedProducts
+        .filter()
+        .productIdEqualTo(productId)
+        .count();
+
+    return count > 0;
+  }
+
   double get totalPrice {
     final currentState = state;
     if (currentState is CartLoaded) {
-      return currentState.items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+      return currentState.items.fold(
+        0,
+        (sum, item) => sum + (item.price * item.quantity),
+      );
     }
     return 0;
   }

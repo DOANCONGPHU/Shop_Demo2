@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_app/features/Cart/views/cart_screen.dart';
 import 'package:my_app/features/Chart/chart_screen.dart';
-import 'package:my_app/features/Chart/debug.dart';
 import 'package:my_app/features/Home/views/homepage_screen.dart';
 import 'package:my_app/features/Home/views/product_detail_screen.dart';
 import 'package:my_app/features/Profile/profile_screen.dart';
-import 'package:my_app/features/tabbar.dart';
+import 'package:my_app/features/Tabbar/tabbar.dart';
 
 class AppRoutes {
   static final router = GoRouter(

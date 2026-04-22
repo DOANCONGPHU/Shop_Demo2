@@ -16,7 +16,7 @@ class BorderListImage extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(
             color: isSelected ? Colors.blue : Colors.transparent,

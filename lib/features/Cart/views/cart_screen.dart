@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_app/features/Cart/cubit/cart_cubit.dart';
+import 'package:my_app/features/Cart/models/cart_model.dart';
 import 'package:my_app/features/Cart/views/cart_item.dart';
 
 class CartPage extends StatelessWidget {
@@ -18,8 +19,10 @@ class CartPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 70, 125, 203),
           ),
+          
         ),
-        backgroundColor: Colors.grey[400],
+        shadowColor: Colors.black,
+        elevation: 1,
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
@@ -27,75 +30,80 @@ class CartPage extends StatelessWidget {
             CartInitial() => const EmptyCartView(),
             CartLoading() => const Center(child: CircularProgressIndicator()),
             CartError(message: var message) => Text('Error: $message'),
-            CartLoaded(items: var items) =>
-              items.isEmpty
-                  ? const EmptyCartView()
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              return CartItemCard(cartItem: items[index]);
-                            },
-                          ),
-                        ),
-                        const Divider(thickness: 2, height: 1),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Total:',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$${context.read<CartCubit>().totalPrice.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 12),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2E5AAC),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  elevation: 4,
-                                  minimumSize: const Size(double.infinity, 50),
-                                ),
-                                onPressed: () {
-                                  //TODO
-                                },
-                                child: const Text('Checkout'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+            CartLoaded(items: var items) => _buildCartContent(context, items),
+            CartCheckoutSuccess(purchasedItems: final items) => const EmptyCartView(),
           };
         },
       ),
     );
   }
+}
+
+Widget _buildCartContent(BuildContext context, List<CartItem> items) {
+  return items.isEmpty
+      ? const EmptyCartView()
+      : Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return CartItemCard(cartItem: items[index]);
+                },
+              ),
+            ),
+            const Divider(thickness: 2, height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '\$${context.read<CartCubit>().totalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2E5AAC),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 4,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    onPressed: () {
+                      // Thực hiện checkout
+                      context.read<CartCubit>().checkout();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Checkout successful!')),
+                      );
+                    },
+                    child: const Text('Checkout'),
+                  ),
+                  SizedBox(height: 70),
+                ],
+              ),
+            ),
+          ],
+        );
 }
 
 class EmptyCartView extends StatelessWidget {

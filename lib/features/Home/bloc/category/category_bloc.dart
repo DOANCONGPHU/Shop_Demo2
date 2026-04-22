@@ -47,7 +47,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     CategoryEvent event,
     Emitter<CategoryState> emit,
   ) async {
-    if (state.isLoading) return; // Ngăn gọi nhiều lần
+    if (state.isLoading) return; 
 
     emit(state.copyWith(isLoading: true, error: null));
 

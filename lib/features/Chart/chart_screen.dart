@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:my_app/features/Chart/model/vietnam_regions.dart';
+
 class ChartScreen extends StatefulWidget {
   const ChartScreen({super.key});
 
@@ -29,10 +30,11 @@ class _ChartScreenState extends State<ChartScreen> {
     final regionMap = buildProvinceToRegionMap();
     final List<Map<String, dynamic>> data = [];
 
+    // Map dữ liệu Vùng vào các Tỉnh để ECharts tô màu
     for (final entry in regionMap.entries) {
       final region = entry.value;
       data.add({
-        "name": entry.key,
+        "name": entry.key, // Tên tỉnh phải khớp với 'ten_tinh' trong GeoJSON
         "value": vietnamRegions.indexOf(region) + 1,
         "itemStyle": {"areaColor": region.color}
       });
@@ -54,8 +56,13 @@ class _ChartScreenState extends State<ChartScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B2A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1B2A),
-        title: const Text('Bản đồ Việt Nam Theo Vùng'),
+        title: Text('Bản đồ Việt Nam Theo Vùng',
+          style: TextStyle(
+            fontSize: 20,
+            color: Color.fromARGB(255, 70, 125, 203),
+            fontWeight: FontWeight.bold,
+          )),
+
       ),
       body: Column(
         children: [
@@ -63,26 +70,30 @@ class _ChartScreenState extends State<ChartScreen> {
             child: Echarts(
               option: '''
               {
-                backgroundColor: '#0D1B2A',
+                backgroundColor: '#2A3849',
                 tooltip: {
                   trigger: 'item',
+                  formatter: '{b}', 
                   backgroundColor: 'rgba(15,23,42,0.95)',
                   textStyle: { color: '#e2e8f0' }
                 },
                 series: [{
                   type: 'map',
                   map: 'vietnam',
+                  nameProperty: 'ten_tinh', // Chỉ định trường chứa tên trong GeoJSON
                   roam: true,
                   zoom: 1.2,
                   label: {
                     show: true,
-                    color: '#e2e8f0',
-                    fontSize: 9
+                    color: '#ffffff',
+                    fontSize: 9,
+                    fontFamily : 'Roboto',
                   },
                   itemStyle: {
                     borderColor: 'rgba(255,255,255,0.3)',
                     borderWidth: 0.8,
                     areaColor: '#1e2937'
+                    
                   },
                   emphasis: {
                     itemStyle: { areaColor: '#fbbf24' },
@@ -96,13 +107,33 @@ class _ChartScreenState extends State<ChartScreen> {
                 try {
                   const geoJson = JSON.parse(${jsonEncode(_geoJsonRaw)});
                   echarts.registerMap('vietnam', geoJson);
+                  
+                  // ĐIỂM QUAN TRỌNG: Lắng nghe sự kiện click trên bản đồ
+                  // flutter_echarts cung cấp instance biểu đồ qua biến 'chart'
+                  if (typeof chart !== 'undefined') {
+                    chart.on('click', function(params) {
+                      if (params.name) {
+                         // Gửi tên tỉnh về lại hàm onMessage của Flutter
+                         Messager.postMessage(params.name);
+                      }
+                    });
+                  }
                 } catch(e) {
                   console.error('GeoJSON Error:', e);
                 }
               ''',
-              onMessage: (String message) {
-                // Xử lý click nếu cần
-                debugPrint('Map click: $message');
+              onMessage: (String provinceName) {
+                debugPrint('Tỉnh được chạm: $provinceName');
+                
+                // Logic xử lý khi có click từ ECharts
+                final regionMap = buildProvinceToRegionMap();
+                if (regionMap.containsKey(provinceName)) {
+                  setState(() {
+                    _selectedRegion = regionMap[provinceName];
+                  });
+                } else {
+                  debugPrint('Không tìm thấy vùng cho tỉnh: $provinceName');
+                }
               },
             ),
           ),
@@ -119,15 +150,13 @@ class _ChartScreenState extends State<ChartScreen> {
                   )
                 : const _HintBar(),
           ),
+          SizedBox(height: 70)
         ],
       ),
     );
   }
 }
 
-// Giữ nguyên các class _LegendBar, _HintBar, _RegionInfoPanel, _StatChip như trước
-
-// ==================== CÁC WIDGET PHỤ ====================
 
 class _LegendBar extends StatelessWidget {
   final List<VietnamRegion> regions;

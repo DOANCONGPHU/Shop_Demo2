@@ -17,7 +17,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   Future<void> _onFetchAllProducts(
       FetchAllProducts event, Emitter<ProductState> emit) async {
-    if (state.isLoading) return; // Ngăn gọi nhiều lần
+    if (state.isLoading) return; 
 
     emit(state.copyWith(isLoading: true, error: null));
 
@@ -35,6 +35,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   Future<void> _onFetchByCategory(
       FetchProductsByCategory event, Emitter<ProductState> emit) async {
     if (state.isLoading) return;
+    if (event.categoryId == 'all') {
+        add(FetchAllProducts());
+        return;
+      }
 
     emit(state.copyWith(isLoading: true, error: null));
 

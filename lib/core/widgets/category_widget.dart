@@ -24,7 +24,6 @@ class CategoryWidget extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            // Hai action này là cần thiết
             context.read<CategoryBloc>().add(SelectCategory(item.slug));
             context.read<ProductBloc>().add(FetchProductsByCategory(item.slug));
           },
@@ -32,7 +31,7 @@ class CategoryWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: isSelected ? Colors.blue : Colors.grey[350],
-              borderRadius: BorderRadius.circular(8), // bo tròn hơn cho đẹp
+              borderRadius: BorderRadius.circular(8), 
             ),
             child: Center(
               child: Text(

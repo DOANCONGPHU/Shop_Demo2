@@ -27,3 +27,11 @@ final class CartError extends CartState {
   @override
   List<Object?> get props => [message];
 }
+
+final class CartCheckoutSuccess extends CartState{
+  final List<CartItem> purchasedItems;
+  const CartCheckoutSuccess(this.purchasedItems);
+
+  @override
+  List<Object?> get props => [purchasedItems];
+}
