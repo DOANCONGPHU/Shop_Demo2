@@ -5,6 +5,7 @@ import 'package:my_app/features/Home/data/models/products.dart';
 import 'package:my_app/features/Home/data/product_api.dart';
 import 'package:my_app/features/Home/data/product_repository.dart';
 import 'package:my_app/core/widgets/border_list_image.dart';
+import 'package:my_app/features/Home/widgets/media_upload.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
@@ -146,6 +147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ],
                     ),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: 16)),
                   SliverToBoxAdapter(child: Divider(thickness: 2, height: 1)),
                   SliverToBoxAdapter(child: const ReviewSection()),
                   SliverToBoxAdapter(child: SizedBox(height: 20)),
@@ -176,9 +178,9 @@ class ReviewSection extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 8),
-        _buildRatingSection(),
+        RatingSection(),
         SizedBox(height: 16),
-        _buildMediaUploadSection(),
+        MediaUploadSection(),
         SizedBox(height: 16),
         _buildReviewInputSection(),
         SizedBox(height: 16),
@@ -189,63 +191,6 @@ class ReviewSection extends StatelessWidget {
     );
   }
 
-  // Vote sao
-  Widget _buildRatingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Đánh giá sản phẩm",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Icon(Icons.star, color: Colors.amber),
-            Icon(Icons.star, color: Colors.amber),
-            Icon(Icons.star, color: Colors.amber),
-            Icon(Icons.star, color: Colors.amber),
-            Icon(Icons.star, color: Colors.amber),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // UP ảnh
-  Widget _buildMediaUploadSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Thêm ít nhất 1 hình ảnh/video về sản phẩm",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-        SizedBox(height: 8),
-        DottedBorder(
-          options: RectDottedBorderOptions(
-            dashPattern: [5, 4],
-            strokeWidth: 1,
-            padding: EdgeInsets.all(16),
-            color: Colors.grey,
-
-          ),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(Icons.camera_alt_outlined, size: 36, color: Colors.grey),
-                SizedBox(height: 8),
-                Text(
-                  "Hình ảnh/Video/Video theo mẫu",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   // Nhập review
   Widget _buildReviewInputSection() {
@@ -258,7 +203,7 @@ class ReviewSection extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
             color: Colors.white,
           ),
           child: Stack(
@@ -314,6 +259,63 @@ class ReviewSection extends StatelessWidget {
         minimumSize: Size(double.infinity, 50),
       ),
       child: Text("Gửi"),
+    );
+  }
+}
+
+// RatingSection.dart  (hoặc để cùng file cũng được)
+class RatingSection extends StatefulWidget {
+  const RatingSection({super.key});
+
+  @override
+  State<RatingSection> createState() => _RatingSectionState();
+}
+
+class _RatingSectionState extends State<RatingSection> {
+  int _rating = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Đánh giá sản phẩm",
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: List.generate(5, (index) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _rating = index + 1;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  Icons.star,
+                  size: 45,
+                  color: index < _rating ? Colors.amber : Colors.grey[300],
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: Text(
+            _rating == 0 ? "Chưa đánh giá" : "$_rating / 5 sao",
+            style: TextStyle(
+              fontSize: 14,
+              color: _rating == 0 ? Colors.grey : Colors.amber,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
