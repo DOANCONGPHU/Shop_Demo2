@@ -4,7 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 
 class MediaUploadSection extends StatefulWidget {
-  const MediaUploadSection({super.key});
+  final Function(List<XFile> selectedImages) onImagesChanged; 
+  const MediaUploadSection({super.key, required this.onImagesChanged});
 
   @override
   State<MediaUploadSection> createState() => _MediaUploadSectionState();
@@ -14,9 +15,12 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _selectedImages = [];
 
+  // Thông báo ảnh đã thay đổi
+  void _notifyImagesChanged() {
+    widget.onImagesChanged(List.from(_selectedImages)); 
+  }
+  // Chọn ảnh
   Future<void> _showImageSourceDialog() async {
-
-  
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -34,6 +38,7 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
                 final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
                 if (photo != null) {
                   setState(() => _selectedImages.add(photo));
+                  _notifyImagesChanged(); 
                 }
               },
             ),
@@ -51,8 +56,16 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
       ),
     );
   }
+  
+  // Xóa ảnh
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+    _notifyImagesChanged();
+  }
 
-
+  // Hiển thị ảnh đã chọn
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -65,7 +78,6 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
         const SizedBox(height: 12),
 
         if (_selectedImages.isEmpty)
-          // Phần DottedBorder ban đầu
           GestureDetector(
             onTap: _showImageSourceDialog,
             child: DottedBorder(
@@ -78,15 +90,11 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
               child: const Center(
                 child: Column(
                   children: [
-                    Icon(Icons.camera_alt_outlined, size: 48, color: Colors.grey),
+                    Icon(Icons.camera_alt_outlined, size: 36, color: Colors.black),
                     SizedBox(height: 12),
                     Text(
                       "Thêm hình ảnh / video",
                       style: TextStyle(fontSize: 15, color: Colors.grey),
-                    ),
-                    Text(
-                      "Chạm để chọn",
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -94,17 +102,15 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
             ),
           )
         else
-          // Phần hiển thị danh sách ảnh đã chọn + nút thêm
           Column(
             children: [
               SizedBox(
                 height: 110,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: _selectedImages.length + 1, // +1 cho nút thêm
+                  itemCount: _selectedImages.length + 1, 
                   itemBuilder: (context, index) {
                     if (index == _selectedImages.length) {
-                      // Nút thêm ảnh
                       return GestureDetector(
                         onTap: _showImageSourceDialog,
                         child: Padding(
@@ -113,12 +119,11 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
                             options: RectDottedBorderOptions(
                               dashPattern: [4, 3],
                               strokeWidth: 1.5,
-                              padding: const EdgeInsets.all(8),
                               color: Colors.grey.shade400,
                             ),
                             child: const SizedBox(
-                              width: 90,
-                              height: 90,
+                              width: 100,
+                              height: 100,
                               child: Center(
                                 child: Icon(Icons.add_photo_alternate, size: 32, color: Colors.grey),
                               ),
@@ -127,17 +132,37 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
                         ),
                       );
                     }
-
-                    // Hiển thị ảnh đã chọn
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          File(_selectedImages[index].path),
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: 100,
+                        height: 90,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          clipBehavior: Clip.none,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                File(_selectedImages[index].path),
+                                width: 100,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 5,
+                              right: 5,
+                              child: GestureDetector(
+                                onTap: () => _removeImage(index),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );

@@ -2,7 +2,7 @@ part of 'category_bloc.dart';
 
 class CategoryState extends Equatable {
   final List<Categories> categories;
-  final String selectedId; // Mặc định là 'all'
+  final String selectedId; 
   final bool isLoading;
   final String?error;
 

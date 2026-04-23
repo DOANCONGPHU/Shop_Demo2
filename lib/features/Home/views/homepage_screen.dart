@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                      NetworkWrapper(),
+                      const NetworkWrapper(),
                       const MySearchBar(),
                       const SizedBox(height: 12),
                       const HomeBannerSection(),
@@ -214,3 +214,4 @@ class HomeProductSection extends StatelessWidget {
     );
   }
 }
+

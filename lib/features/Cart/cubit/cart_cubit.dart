@@ -5,13 +5,15 @@ import 'package:isar_community/isar.dart';
 import 'package:my_app/core/database/isar_service.dart';
 import 'package:my_app/features/Cart/models/cart_model.dart';
 import 'package:my_app/features/Cart/models/purchased_product.dart';
+import 'package:my_app/features/Home/data/product_repository.dart';
 
 part 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
   final IsarService isarService;
+  final ProductRepository repo;
 
-  CartCubit(this.isarService) : super(CartInitial());
+  CartCubit(this.isarService, this.repo) : super(CartInitial());
 
   void addToCart(CartItem newItem) {
     List<CartItem> currentItems = [];
@@ -75,7 +77,7 @@ class CartCubit extends Cubit<CartState> {
       await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
       final purchasedItems = List<CartItem>.from(currentItems);
 
-      await _savePurchasedProducts(purchasedItems);
+      await repo.savePurchasedProducts(purchasedItems);
 
       emit(CartCheckoutSuccess(purchasedItems));
     } catch (e) {
@@ -83,16 +85,6 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> _savePurchasedProducts(List<CartItem> purchasedItems) async {
-    final isar = isarService.db;
-    final List<PurchasedProduct> purchasedProducts = purchasedItems.map((item) {
-      return PurchasedProduct(productId: item.id.toString());
-    }).toList();
-
-    await isar.writeTxn(() async {
-      await isar.purchasedProducts.putAll(purchasedProducts);
-    });
-  }
 
   Future<bool> isProductPurchased(String productId) async {
     final isar = isarService.db;

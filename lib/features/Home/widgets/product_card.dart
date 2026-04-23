@@ -38,7 +38,6 @@ class ProductCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start, 
           children: [
-
             ClipRRect(
               borderRadius: BorderRadius.circular(8), 
               child: Image.network(

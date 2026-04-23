@@ -5,6 +5,7 @@ import 'package:my_app/core/network/network_cubit.dart';
 import 'package:my_app/core/routes/app_routes.dart';
 import 'package:my_app/features/Home/bloc/banner/banner_bloc.dart';
 import 'package:my_app/features/Home/bloc/category/category_bloc.dart';
+import 'package:my_app/features/Home/bloc/product%20detail/product_detail_bloc.dart';
 import 'package:my_app/features/Home/bloc/product/product_bloc.dart';
 import 'package:my_app/features/Home/data/dio_client.dart';
 import 'package:my_app/features/Home/data/product_api.dart';
@@ -49,10 +50,16 @@ class MyApp extends StatelessWidget {
           create: (context) => CategoryBloc(context.read<ProductRepository>()),
         ),
         BlocProvider<CartCubit>(
-          create: (_) => CartCubit(context.read<IsarService>()),
+          create: (_) => CartCubit(context.read<IsarService>(), context.read<ProductRepository>()),
         ),
         BlocProvider<NetworkCubit>(
           create: (_) => NetworkCubit(),
+        ),
+        BlocProvider<ProductDetailBloc>(
+          create: (context) => ProductDetailBloc(
+            context.read<ProductRepository>(),
+            context.read<IsarService>(),
+          ),
         ),
       ],
       child: MaterialApp.router(

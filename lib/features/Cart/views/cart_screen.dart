@@ -31,7 +31,7 @@ class CartPage extends StatelessWidget {
             CartLoading() => const Center(child: CircularProgressIndicator()),
             CartError(message: var message) => Text('Error: $message'),
             CartLoaded(items: var items) => _buildCartContent(context, items),
-            CartCheckoutSuccess(purchasedItems: final items) => const EmptyCartView(),
+            CartCheckoutSuccess(purchasedItems: _) => const EmptyCartView(),
           };
         },
       ),
