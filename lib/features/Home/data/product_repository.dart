@@ -11,8 +11,8 @@ import 'package:sqflite/sqflite.dart';
 
 class ProductRepository {
   final ProductApi api;
-  final IsarService isarService = IsarService();
-  final SqfliteService _dbHelper = SqfliteService();
+  final IsarService isarService;
+  final SqfliteService _dbHelper;
 
 
   // Cache in-memory
@@ -21,7 +21,8 @@ class ProductRepository {
   List<Categories>? _cachedCategories;
   List<Products>? _cachedBanners;
 
-  ProductRepository(this.api);
+  ProductRepository(this.api, this.isarService) 
+      : _dbHelper = SqfliteService();
 
   Future<List<Products>> getProducts() async {
     if (_cachedAllProducts != null) return _cachedAllProducts!;
@@ -107,6 +108,8 @@ class ProductRepository {
   // Review - insert
   Future<int> saveReview(ProductReview review) async {
     final db = await _dbHelper.database;
+    // Xóa review cũ của productId này trước khi thêm mới để đảm bảo mỗi product chỉ có 1 review mới nhất
+    await db.delete('reviews', where: 'productId = ?', whereArgs: [review.productId]);
     return await db.insert(
       'reviews',
       review.toMap(),
@@ -120,6 +123,7 @@ class ProductRepository {
       'reviews',
       where: 'productId = ?',
       whereArgs: [productId],
+      orderBy: 'id DESC', // Lấy review mới nhất
     );
     if (maps.isNotEmpty) {
       return ProductReview.fromMap(maps.first);
@@ -128,7 +132,7 @@ class ProductRepository {
   }
   // Save purchased products
   Future<void> savePurchasedProducts(List<CartItem> purchasedItems) async {
-    final isar = isarService.db;
+    final isar = await isarService.db;
     final List<PurchasedProduct> purchasedProducts = purchasedItems.map((item) {
       return PurchasedProduct(productId: item.id.toString());
     }).toList();
@@ -136,6 +140,8 @@ class ProductRepository {
     await isar.writeTxn(() async {
       await isar.purchasedProducts.putAll(purchasedProducts);
     });
+
+    
   }
 
   String _mapError(DioException e) {

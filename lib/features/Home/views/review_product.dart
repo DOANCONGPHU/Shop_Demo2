@@ -6,26 +6,43 @@ import 'package:my_app/features/Home/data/models/product_review.dart';
 import 'package:my_app/features/Home/widgets/media_upload.dart';
 import 'package:my_app/features/Home/widgets/rating_section.dart';
 
-class ReviewSection extends StatefulWidget { 
-  const ReviewSection({super.key,});
+class ReviewSection extends StatefulWidget {
+  final int productId;
+  const ReviewSection({super.key, required this.productId});
 
   @override
   State<ReviewSection> createState() => _ReviewSectionState();
 }
 
 class _ReviewSectionState extends State<ReviewSection> {
-  int _selectedRating = 0;  
-  List<XFile> _selectedImages = [];   
+  int _selectedRating = 0;
+  List<XFile> _selectedImages = [];
   final TextEditingController _inputReview = TextEditingController();
 
+  // Hàm gửi review
   void _onReviewSubmitted(BuildContext context) {
+    if (_selectedRating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng chọn số sao đánh giá")),
+      );
+      return;
+    }
+
+    if (_inputReview.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Vui lòng nhập bình luận")));
+      return;
+    }
+    print("Số lượng ảnh được chọn: ${_selectedImages.length}");
+
+    // Gửi review
     final addReview = ProductReview(
-      productId: 1,
-      isReviewed: true, 
-      rating: _selectedRating, 
-      comment: _inputReview.text, 
-      images: _selectedImages.map((file) => file.path).toList(), 
-      
+      productId: widget.productId,
+      isReviewed: true,
+      rating: _selectedRating,
+      comment: _inputReview.text,
+      images: _selectedImages.map((file) => file.path).toList(),
     );
     context.read<ProductDetailBloc>().add(ReviewSubmitted(addReview));
   }
@@ -44,7 +61,7 @@ class _ReviewSectionState extends State<ReviewSection> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-          RatingSection(
+        RatingSection(
           onRatingChanged: (rating) {
             setState(() {
               _selectedRating = rating;

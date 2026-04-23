@@ -89,7 +89,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           if (isReviewed)
             SliverToBoxAdapter(child: ReviewedSection(review: review!))
           else if (isPurchased)
-            SliverToBoxAdapter(child: ReviewSection())
+            SliverToBoxAdapter(child: ReviewSection(productId: product.id))
           else
             SliverToBoxAdapter(child: Text("Bạn chưa mua sản phẩm này")),
 

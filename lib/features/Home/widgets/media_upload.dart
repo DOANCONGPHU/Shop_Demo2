@@ -18,6 +18,7 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
   // Thông báo ảnh đã thay đổi
   void _notifyImagesChanged() {
     widget.onImagesChanged(List.from(_selectedImages)); 
+    print("💥💥💥💥💥${_selectedImages}");
   }
   // Chọn ảnh
   Future<void> _showImageSourceDialog() async {
@@ -49,6 +50,7 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
                 Navigator.pop(context);
                 final List<XFile> images = await _picker.pickMultiImage();
                 setState(() => _selectedImages.addAll(images));
+                _notifyImagesChanged();
               },
             ),
           ],
@@ -145,6 +147,7 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
                               borderRadius: BorderRadius.circular(12),
                               child: Image.file(
                                 File(_selectedImages[index].path),
+                                
                                 width: 100,
                                 height: 90,
                                 fit: BoxFit.cover,

@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:isar_community/isar.dart';
-
 import 'package:my_app/core/database/isar_service.dart';
 import 'package:my_app/features/Cart/models/cart_model.dart';
 import 'package:my_app/features/Cart/models/purchased_product.dart';
@@ -85,17 +84,21 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-
   Future<bool> isProductPurchased(String productId) async {
-    final isar = isarService.db;
+  try {
+    final isar = await isarService.db;  
+
     final count = await isar.purchasedProducts
         .filter()
         .productIdEqualTo(productId)
         .count();
 
     return count > 0;
+  } catch (e) {
+      emit(CartError("Lỗi kiểm tra mua hàng: ${e.toString()}"));
+    return false;
   }
-
+}
   double get totalPrice {
     final currentState = state;
     if (currentState is CartLoaded) {

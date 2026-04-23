@@ -17,11 +17,12 @@ void main() async {
 
   final dioClient = DioClient();
   final productApi = ProductApi(dioClient.dio);
-  final productRepository = ProductRepository(productApi);
 
   final isarService = IsarService();
   await isarService.init();
 
+  final productRepository = ProductRepository(productApi, isarService);
+  
   runApp(
     RepositoryProvider<ProductRepository>.value(
       value: productRepository,

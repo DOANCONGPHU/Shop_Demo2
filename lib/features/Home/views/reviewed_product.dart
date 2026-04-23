@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:my_app/features/Home/data/models/product_review.dart';
 
@@ -55,13 +54,14 @@ class ReviewedSection extends StatelessWidget {
                   SizedBox(height: 4),
                   Row(
                     children: List.generate(5, (index) {
-                        return Icon(
-                          Icons.star_rounded,
-                          size: 18,
-                          color: index < review.rating ? Colors.amber : Colors.grey[300],
-                        );
-                      }),
-                    
+                      return Icon(
+                        Icons.star_rounded,
+                        size: 18,
+                        color: index < review.rating
+                            ? Colors.amber
+                            : Colors.grey[300],
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -81,22 +81,45 @@ class ReviewedSection extends StatelessWidget {
 
           // Footer
           const SizedBox(height: 12),
+          Text(
+            "Số lượng ảnh: ${review.images.length}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           SizedBox(
             height: 100,
             width: double.infinity,
             child: ListView.separated(
               separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemCount: 4,
+              itemCount: review.images.length,
               scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) => ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(review.images[index]),
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              itemBuilder: (context, index) {
+                final String imagePath = review.images[index];
+                print('=== DEBUG ẢNH ===');
+                print('Index: $index');
+                print('Đường dẫn: $imagePath');
+                print('File tồn tại: ${File(imagePath).existsSync()}');
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(imagePath),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Lỗi hiển thị ảnh: $imagePath - $error');
+                      return Container(
+                        width: 100,
+                        height: 100,
+                        color: Colors.grey[200],
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[400],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ],

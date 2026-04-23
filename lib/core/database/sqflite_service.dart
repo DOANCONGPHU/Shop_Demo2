@@ -34,7 +34,7 @@ Future _onCreate(Database db, int version) async {
       isReviewed INTEGER NOT NULL DEFAULT 1,   
       rating INTEGER NOT NULL,
       comment TEXT,
-      images TEXT,                             
+      images TEXT                            
     )
   ''');
 }

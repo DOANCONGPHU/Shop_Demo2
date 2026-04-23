@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 class ProductReview {
   final int? productId;
   final bool isReviewed;           
@@ -11,7 +13,7 @@ class ProductReview {
     required this.isReviewed,
     required this.rating,
     required this.comment,
-    required this.images,
+    this.images = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -20,7 +22,7 @@ class ProductReview {
       'isReviewed': isReviewed ? 1 : 0,
       'rating': rating,
       'comment': comment,
-      'images': images,
+      'images': jsonEncode(images),
     };
   }
 
@@ -30,7 +32,7 @@ class ProductReview {
       isReviewed: map['isReviewed'] == 1,
       rating: map['rating'],  
       comment: map['comment'],
-      images: List<String>.from(map['images']),
+      images: map['images'] != null ? List<String>.from(json.decode(map['images'])) : [],
     );
   }
 }

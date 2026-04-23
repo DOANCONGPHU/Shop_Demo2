@@ -28,7 +28,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
     if (state is ProductDetailLoading) return;
 
     emit(ProductDetailLoading());
-    //TODO
+  
     try {
       final product = await repo.getProductById(event.productId);
       final review = await repo.getReviewByProduct(event.productId);
@@ -56,7 +56,7 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
   }
 
   Future<bool> _onCheckProductPurchased(int productId) async {
-    final isar = isarService.db;
+    final isar = await isarService.db;
     final count = await isar.purchasedProducts
         .filter()
         .productIdEqualTo(productId.toString())
@@ -83,6 +83,8 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
         images: event.review.images,
       );
       await repo.saveReview(review);
+      add(FetchProductDetail(event.review.productId ?? 7));
+
     } catch (e) {
       "Lỗi khi lưu review: $e";
     }
