@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_app/core/Notification/notification_service.dart';
 import 'package:my_app/features/Cart/cubit/cart_cubit.dart';
 import 'package:my_app/features/Cart/models/cart_model.dart';
 import 'package:my_app/features/Cart/views/cart_item.dart';
@@ -92,9 +93,9 @@ Widget _buildCartContent(BuildContext context, List<CartItem> items) {
                     onPressed: () {
                       // Thực hiện checkout
                       context.read<CartCubit>().checkout();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Checkout successful!')),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text('Checkout successful!')),
+                      // );
                     },
                     child: const Text('Checkout'),
                   ),

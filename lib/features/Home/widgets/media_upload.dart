@@ -18,7 +18,6 @@ class _MediaUploadSectionState extends State<MediaUploadSection> {
   // Thông báo ảnh đã thay đổi
   void _notifyImagesChanged() {
     widget.onImagesChanged(List.from(_selectedImages)); 
-    print("💥💥💥💥💥${_selectedImages}");
   }
   // Chọn ảnh
   Future<void> _showImageSourceDialog() async {

@@ -31,7 +31,7 @@ class AppRoutes {
                 const NoTransitionPage(child: ChartScreen()),
           ),
           GoRoute(
-            path: '/profile',
+            path: '/map',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfileScreen()),
           ),

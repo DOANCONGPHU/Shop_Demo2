@@ -24,6 +24,7 @@ class ProductRepository {
   ProductRepository(this.api, this.isarService) 
       : _dbHelper = SqfliteService();
 
+  // Lấy tất cả sản phẩm
   Future<List<Products>> getProducts() async {
     if (_cachedAllProducts != null) return _cachedAllProducts!;
 
@@ -39,7 +40,7 @@ class ProductRepository {
       throw _mapError(e);
     }
   }
-
+  // Lọc sản phẩm theo danh mục
   Future<List<Products>> getProductsByCategory(String category) async {
     if (_cachedByCategory.containsKey(category)) {
       return _cachedByCategory[category]!;
@@ -57,7 +58,7 @@ class ProductRepository {
       throw _mapError(e);
     }
   }
-
+  // Banner
   Future<List<Products>> getBanners() async {
     if (_cachedBanners != null) return _cachedBanners!;
 
@@ -73,7 +74,7 @@ class ProductRepository {
       throw _mapError(e);
     }
   }
-
+  // Category
   Future<List<Categories>> getCategories() async {
     if (_cachedCategories != null) return _cachedCategories!;
 
@@ -89,7 +90,8 @@ class ProductRepository {
       throw _mapError(e);
     }
   }
-    Future<Products> getProductById(int id) async {
+  // Lấy sản phẩm theo ID 
+  Future<Products> getProductById(int id) async {
     try {
       final response = await api.getProductById(id);
       return Products.fromJson(response.data);
@@ -105,10 +107,9 @@ class ProductRepository {
     _cachedBanners = null;
   }
 
-  // Review - insert
+  // Review - lưu đánh giá
   Future<int> saveReview(ProductReview review) async {
     final db = await _dbHelper.database;
-    // Xóa review cũ của productId này trước khi thêm mới để đảm bảo mỗi product chỉ có 1 review mới nhất
     await db.delete('reviews', where: 'productId = ?', whereArgs: [review.productId]);
     return await db.insert(
       'reviews',
@@ -116,21 +117,23 @@ class ProductRepository {
       conflictAlgorithm: ConflictAlgorithm.replace,  
     );
   }
-  // Review - get by product
+
+  // Review - lấy đánh giá theo sản phẩm
   Future<ProductReview?> getReviewByProduct(int productId) async {
     final db = await _dbHelper.database;
     final maps = await db.query(
       'reviews',
       where: 'productId = ?',
       whereArgs: [productId],
-      orderBy: 'id DESC', // Lấy review mới nhất
+      orderBy: 'id DESC', 
     );
     if (maps.isNotEmpty) {
       return ProductReview.fromMap(maps.first);
     }
     return null;
   }
-  // Save purchased products
+
+  // Lưu sản phẩm đã mua
   Future<void> savePurchasedProducts(List<CartItem> purchasedItems) async {
     final isar = await isarService.db;
     final List<PurchasedProduct> purchasedProducts = purchasedItems.map((item) {
@@ -138,12 +141,14 @@ class ProductRepository {
     }).toList();
 
     await isar.writeTxn(() async {
+      await isar.purchasedProducts.clear();
       await isar.purchasedProducts.putAll(purchasedProducts);
     });
 
     
   }
-
+  
+  
   String _mapError(DioException e) {
   if (e.type == DioExceptionType.connectionTimeout) {
     return "Timeout kết nối";

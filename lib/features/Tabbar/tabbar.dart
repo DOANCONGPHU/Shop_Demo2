@@ -75,11 +75,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
                   onTap: () => context.go('/cart'),
                 ),
                 _NavItem(
-                  icon: Icons.person_outline,
-                  selectedIcon: Icons.person,
+                  icon: Icons.map_outlined,
+                  selectedIcon: Icons.map,
                   index: 3,
                   selectedIndex: selectedIndex,
-                  onTap: () => context.go('/profile'),
+                  onTap: () => context.go('/map'),
                 ),
                 _NavItem(
                   icon: Icons.settings_outlined,
@@ -100,7 +100,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/chart')) return 1;
     if (location.startsWith('/cart')) return 2;
-    if (location.startsWith('/profile')) return 3;
+    if (location.startsWith('/map')) return 3;
     if (location.startsWith('/settings')) return 4;
     return 0;
   }

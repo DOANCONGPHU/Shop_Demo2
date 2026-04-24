@@ -1,6 +1,8 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:isar_community/isar.dart';
+import 'package:my_app/core/Notification/notification_service.dart';
 import 'package:my_app/core/database/isar_service.dart';
 import 'package:my_app/features/Cart/models/cart_model.dart';
 import 'package:my_app/features/Cart/models/purchased_product.dart';
@@ -13,7 +15,7 @@ class CartCubit extends Cubit<CartState> {
   final ProductRepository repo;
 
   CartCubit(this.isarService, this.repo) : super(CartInitial());
-
+  // Thêm sản phẩm vào giỏ hàng
   void addToCart(CartItem newItem) {
     List<CartItem> currentItems = [];
 
@@ -36,6 +38,7 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoaded(currentItems));
   }
 
+  // Xoá sản phẩm khỏi giỏ hàng
   void removeFromCart(int itemId) {
     if (state is CartLoaded) {
       final updatedItems = (state as CartLoaded).items
@@ -45,6 +48,7 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
+  // Cập nhật số lượng sản phẩm trong giỏ hàng
   void updateQuantity(int itemId, int newQuantity) {
     if (state is CartLoaded) {
       if (newQuantity <= 0) {
@@ -64,6 +68,7 @@ class CartCubit extends Cubit<CartState> {
     emit(const CartLoaded([]));
   }
 
+  // Thanh toán
   Future<void> checkout() async {
     if (state is! CartLoaded || (state as CartLoaded).items.isEmpty) {
       emit(const CartError("Giỏ hàng trống!"));
@@ -78,27 +83,39 @@ class CartCubit extends Cubit<CartState> {
 
       await repo.savePurchasedProducts(purchasedItems);
 
+      await NotificationService().showNotification(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: 'Đơn hàng đã hoàn tất',
+        body:
+            'Bạn hài lòng với sản phẩm này chứ? Hãy dành 30 giây đánh giá nhé!',
+        payload: 'open_review_',
+        channelId: 'review_channel',
+        channelName: 'Đánh giá sản phẩm',
+      );
+
       emit(CartCheckoutSuccess(purchasedItems));
     } catch (e) {
       emit(CartError("Checkout thất bại: ${e.toString()}"));
     }
   }
 
+  // Kiểm tra sản phẩm đã mua hay chưa
   Future<bool> isProductPurchased(String productId) async {
-  try {
-    final isar = await isarService.db;  
+    try {
+      final isar = await isarService.db;
 
-    final count = await isar.purchasedProducts
-        .filter()
-        .productIdEqualTo(productId)
-        .count();
+      final count = await isar.purchasedProducts
+          .filter()
+          .productIdEqualTo(productId)
+          .count();
 
-    return count > 0;
-  } catch (e) {
+      return count > 0;
+    } catch (e) {
       emit(CartError("Lỗi kiểm tra mua hàng: ${e.toString()}"));
-    return false;
+      return false;
+    }
   }
-}
+
   double get totalPrice {
     final currentState = state;
     if (currentState is CartLoaded) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_app/core/network/network_cubit.dart';
 import 'package:my_app/core/network/network_wrapper.dart';
@@ -127,7 +128,7 @@ class HomeBannerSection extends StatelessWidget {
           BannerLoaded(banners: var data) => BannerWidget(
             bannerImages: data.map((b) => b.thumbnail).toList(),
           ),
-          BannerError() => const Center(child: Text("Lỗi load banner")),
+          BannerError(message: var message) => Center(child: Text(message)),
         };
       },
     );

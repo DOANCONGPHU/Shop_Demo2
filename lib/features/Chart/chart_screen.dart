@@ -21,6 +21,12 @@ class _ChartScreenState extends State<ChartScreen> {
     _loadGeoJson();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    print("đã xoá Chart khỏi cây widget");
+  }
+
   Future<void> _loadGeoJson() async {
     final raw = await rootBundle.loadString('assets/vietnam.geojson');
     setState(() => _geoJsonRaw = raw);
@@ -30,13 +36,12 @@ class _ChartScreenState extends State<ChartScreen> {
     final regionMap = buildProvinceToRegionMap();
     final List<Map<String, dynamic>> data = [];
 
-    // Map dữ liệu Vùng vào các Tỉnh để ECharts tô màu
     for (final entry in regionMap.entries) {
       final region = entry.value;
       data.add({
-        "name": entry.key, // Tên tỉnh phải khớp với 'ten_tinh' trong GeoJSON
+        "name": entry.key,
         "value": vietnamRegions.indexOf(region) + 1,
-        "itemStyle": {"areaColor": region.color}
+        "itemStyle": {"areaColor": region.color},
       });
     }
     return jsonEncode(data);
@@ -56,19 +61,21 @@ class _ChartScreenState extends State<ChartScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B2A),
       appBar: AppBar(
-        title: Text('Bản đồ Việt Nam Theo Vùng',
+        title: Text(
+          'Bản đồ Việt Nam Theo Vùng',
           style: TextStyle(
             fontSize: 20,
             color: Color.fromARGB(255, 70, 125, 203),
             fontWeight: FontWeight.bold,
-          )),
-
+          ),
+        ),
       ),
       body: Column(
         children: [
           Expanded(
             child: Echarts(
-              option: '''
+              option:
+                  '''
               {
                 backgroundColor: '#2A3849',
                 tooltip: {
@@ -103,7 +110,8 @@ class _ChartScreenState extends State<ChartScreen> {
                 }]
               }
               ''',
-              extraScript: '''
+              extraScript:
+                  '''
                 try {
                   const geoJson = JSON.parse(${jsonEncode(_geoJsonRaw)});
                   echarts.registerMap('vietnam', geoJson);
@@ -124,7 +132,7 @@ class _ChartScreenState extends State<ChartScreen> {
               ''',
               onMessage: (String provinceName) {
                 debugPrint('Tỉnh được chạm: $provinceName');
-                
+
                 // Logic xử lý khi có click từ ECharts
                 final regionMap = buildProvinceToRegionMap();
                 if (regionMap.containsKey(provinceName)) {
@@ -150,13 +158,12 @@ class _ChartScreenState extends State<ChartScreen> {
                   )
                 : const _HintBar(),
           ),
-          SizedBox(height: 70)
+          SizedBox(height: 70),
         ],
       ),
     );
   }
 }
-
 
 class _LegendBar extends StatelessWidget {
   final List<VietnamRegion> regions;
@@ -175,9 +182,19 @@ class _LegendBar extends StatelessWidget {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
               const SizedBox(width: 6),
-              Text(r.shortName, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+              Text(
+                r.shortName,
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
             ],
           );
         }).toList(),
@@ -199,7 +216,10 @@ class _HintBar extends StatelessWidget {
         children: [
           Icon(Icons.touch_app_outlined, color: Colors.white38, size: 16),
           SizedBox(width: 8),
-          Text('Chạm vào tỉnh/thành để xem thông tin', style: TextStyle(color: Colors.white54, fontSize: 13)),
+          Text(
+            'Chạm vào tỉnh/thành để xem thông tin',
+            style: TextStyle(color: Colors.white54, fontSize: 13),
+          ),
         ],
       ),
     );
@@ -224,22 +244,58 @@ class _RegionInfoPanel extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(width: 14, height: 14, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4))),
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: Text(region.name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold))),
-              IconButton(icon: const Icon(Icons.close, color: Colors.white54), onPressed: onClose, padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+              Expanded(
+                child: Text(
+                  region.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white54),
+                onPressed: onClose,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(region.description, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+          Text(
+            region.description,
+            style: const TextStyle(color: Colors.white60, fontSize: 12),
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
-              _StatChip(label: 'Dân số', value: '~${region.population}M', color: color),
+              _StatChip(
+                label: 'Dân số',
+                value: '~${region.population}M',
+                color: color,
+              ),
               const SizedBox(width: 8),
-              _StatChip(label: 'GDP', value: '${region.gdpShare}%', color: color),
+              _StatChip(
+                label: 'GDP',
+                value: '${region.gdpShare}%',
+                color: color,
+              ),
               const SizedBox(width: 8),
-              _StatChip(label: 'Tỉnh', value: '${region.provinces.length}', color: color),
+              _StatChip(
+                label: 'Tỉnh',
+                value: '${region.provinces.length}',
+                color: color,
+              ),
             ],
           ),
         ],
@@ -253,7 +309,11 @@ class _StatChip extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _StatChip({required this.label, required this.value, required this.color});
+  const _StatChip({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -267,8 +327,18 @@ class _StatChip extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
-          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 9)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 9),
+          ),
         ],
       ),
     );

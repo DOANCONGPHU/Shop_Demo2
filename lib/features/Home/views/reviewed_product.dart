@@ -24,6 +24,7 @@ class ReviewedSection extends StatelessWidget {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Row(
@@ -81,10 +82,10 @@ class ReviewedSection extends StatelessWidget {
 
           // Footer
           const SizedBox(height: 12),
-          Text(
-            "Số lượng ảnh: ${review.images.length}",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          // Text(
+          //   "Số lượng ảnh: ${review.images.length}",
+          //   style: const TextStyle(fontWeight: FontWeight.bold),
+          // ),
           SizedBox(
             height: 100,
             width: double.infinity,
@@ -94,10 +95,6 @@ class ReviewedSection extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 final String imagePath = review.images[index];
-                print('=== DEBUG ẢNH ===');
-                print('Index: $index');
-                print('Đường dẫn: $imagePath');
-                print('File tồn tại: ${File(imagePath).existsSync()}');
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.file(
@@ -106,7 +103,6 @@ class ReviewedSection extends StatelessWidget {
                     height: 100,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      print('Lỗi hiển thị ảnh: $imagePath - $error');
                       return Container(
                         width: 100,
                         height: 100,

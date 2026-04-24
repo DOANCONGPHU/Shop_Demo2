@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_app/core/Notification/fcm_service.dart';
+import 'package:my_app/core/Notification/notification_service.dart';
 import 'package:my_app/core/database/isar_service.dart';
 import 'package:my_app/core/network/network_cubit.dart';
 import 'package:my_app/core/routes/app_routes.dart';
@@ -11,27 +13,37 @@ import 'package:my_app/features/Home/data/dio_client.dart';
 import 'package:my_app/features/Home/data/product_api.dart';
 import 'package:my_app/features/Home/data/product_repository.dart';
 import 'package:my_app/features/Cart/cubit/cart_cubit.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final dioClient = DioClient();
   final productApi = ProductApi(dioClient.dio);
-
+  
+  await NotificationService().init();
+  
   final isarService = IsarService();
   await isarService.init();
 
-  final productRepository = ProductRepository(productApi, isarService);
+  final fcmService = FCMService();
   
+  
+  final productRepository = ProductRepository(productApi, isarService);
+
+
   runApp(
     RepositoryProvider<ProductRepository>.value(
       value: productRepository,
-      child: RepositoryProvider<IsarService>.value(   
+      child: RepositoryProvider<IsarService>.value(
         value: isarService,
         child: const MyApp(),
       ),
     ),
   );
+  await fcmService.init();
 }
 
 class MyApp extends StatelessWidget {
@@ -51,11 +63,12 @@ class MyApp extends StatelessWidget {
           create: (context) => CategoryBloc(context.read<ProductRepository>()),
         ),
         BlocProvider<CartCubit>(
-          create: (_) => CartCubit(context.read<IsarService>(), context.read<ProductRepository>()),
+          create: (_) => CartCubit(
+            context.read<IsarService>(),
+            context.read<ProductRepository>(),
+          ),
         ),
-        BlocProvider<NetworkCubit>(
-          create: (_) => NetworkCubit(),
-        ),
+        BlocProvider<NetworkCubit>(create: (_) => NetworkCubit()),
         BlocProvider<ProductDetailBloc>(
           create: (context) => ProductDetailBloc(
             context.read<ProductRepository>(),

@@ -16,7 +16,7 @@ class BannerBloc extends Bloc<BannerEvent, BannerState> {
 
   Future<void> _onFetchBanners(
       FetchBanners event, Emitter<BannerState> emit) async {
-    if (state is BannerLoading) return; // Ngăn gọi nhiều lần
+    if (state is BannerLoading) return;
 
     emit(BannerLoading());
 
